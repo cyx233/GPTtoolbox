@@ -7,10 +7,11 @@ pip install -r requirements.txt
 ```
 
 ## API key
-Add a text file `apikey` in `src`
-```
-xx-xxxxxxx[YOUR_API_KEY]
-```
+1. Get Your [Openai API keys](https://platform.openai.com/account/api-keys)
+2. Add a text file named `apikey` in `src`
+    ```
+    xxxxxxxxx[YOUR_API_KEY]
+    ```
 
 ## Usage
 Available programs
