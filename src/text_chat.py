@@ -4,8 +4,12 @@ import time
 import json
 import argparse
 
+src_dir = os.path.dirname(__file__)
+keyfile = os.path.normpath(os.path.join(src_dir, "apikey"))
+save_dir = os.path.normpath(os.path.join(src_dir, "../saves"))
+
 # Set your API key
-with open("apikey") as f:
+with open(keyfile) as f:
     openai.api_key = f.read().strip()
 
 # Set the chatbot's parameters
@@ -67,7 +71,6 @@ def main(args):
                 elif m['role']=="assistant":
                     print("AI:\n" + m['content'])
     conversation_title = ""
-    save_dir = "../saves"
     os.makedirs(save_dir, exist_ok=True)
     print("Welcome to the GPT API! Type '@quit' to exit.")
     print("Enter/Paste your content. Press Ctrl-D on a new line to submit.")
