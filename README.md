@@ -16,12 +16,13 @@ pip install -r requirements.txt
 **Important Action: Ensure the safety of your API keys. Never make them publicly accessible or upload them to a public repository.**
 
 ## Usage
-Available programs
+### Available programs
 |Filename|Fucntion|
 |--|--|
 |src/text_chat.py| Text conversation|
 
 
+### text_chat.py
 Enter/Paste your content. Press Ctrl-D on a new line to submit.
 ```
 User:
