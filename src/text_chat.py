@@ -73,8 +73,9 @@ def main(args):
             print("\n")
     conversation_title = ""
     os.makedirs(save_dir, exist_ok=True)
-    print("Welcome to the GPT API! Type '@quit' to exit.")
+    print("Welcome to the GPT API!")
     print("Enter/Paste your content. Press Ctrl-D on a new line to submit.")
+    print("Submit '@quit' to exit.")
     while True:
         message = get_input()
         if message.lower() == "@quit":
