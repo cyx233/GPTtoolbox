@@ -3,10 +3,7 @@ import openai
 import time
 import json
 import argparse
-
-src_dir = os.path.dirname(__file__)
-keyfile = os.path.normpath(os.path.join(src_dir, "apikey"))
-save_dir = os.path.normpath(os.path.join(src_dir, "../saves"))
+from utils import *
 
 # Set your API key
 with open(keyfile) as f:
@@ -19,44 +16,6 @@ chat_params = {
     "stream":True,
     "user":"cyxisaac@gmail.com"
 }
-
-
-# Define the function to send a message to the chatbot and get a response
-def chat(message, chat_log=None):
-    if chat_log is None:
-        chat_log = []
-    chat_log.append({"role":"user", "content":message})
-    try:
-        response = openai.ChatCompletion.create(
-            messages=chat_log,
-            **chat_params
-        )
-    except Error as e:
-        print(e)
-    print("AI:")
-    collected_messages = []
-    for chunk in response:
-        # skip header 
-        # header \n\n content
-        chunk_message = chunk["choices"][0]["delta"].get("content", "")  # extract the message
-        if chunk_message == "\n\n":
-            continue
-        print(chunk_message,end="",flush=True)
-        collected_messages.append(chunk_message)
-    chat_log.append({"role": "assistant", "content":"".join(collected_messages)})
-    print("\n")
-    return chat_log
-
-def get_input():
-    print("User:")
-    contents = []
-    while True:
-        try:
-            line = input().strip()
-        except EOFError:
-            break
-        contents.append(line)
-    return "\n".join(contents)
 
 def main(args):
     # Start the chat
@@ -71,25 +30,30 @@ def main(args):
                 elif m['role']=="assistant":
                     print("AI:\n" + m['content'])
             print("\n")
-    conversation_title = ""
+    chat_title = ""
     os.makedirs(save_dir, exist_ok=True)
     print("Welcome to the GPT API!")
     print("Enter/Paste your content. Press Ctrl-D on a new line to submit.")
-    print("Submit '@quit' to exit.")
+    print("Press Ctrl-C to quit")
     while True:
-        message = get_input()
-        if message.lower() == "@quit":
-            # Prompt for conversation title and save conversation log to file
-            conversation_title = input("Enter a title for the conversation: ")
-            if conversation_title:
-                filename = os.path.join(save_dir,time.strftime(f"{conversation_title}_%Y%m%d_%H%M%S.json"))
+        try:
+            message = get_user_input()
+        except KeyboardInterrupt:
+            # Prompt for chat title and save chat log to file
+            print("")
+            try:
+                chat_title = input("Enter a title for the chat: ")
+            except KeyboardInterrupt: 
+                print("")
+            if chat_title:
+                filename = os.path.join(save_dir,time.strftime(f"{chat_title}_%Y%m%d_%H%M%S.json"))
             else:
                 filename = os.path.join(save_dir,"last_chat.json")
             with open(filename, 'w') as f:
                 json.dump(chat_log, f)
-            print("Conversation log saved to file: " + filename)
+            print("Chat log saved to file: " + filename)
             break
-        chat_log = chat(message, chat_log)
+        chat_log = chat(message, chat_log, chat_params)
 
 
 if __name__ == "__main__":

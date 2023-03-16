@@ -20,12 +20,11 @@ This is the first example.
 This is a multiple lines example.
 [Ctrl^D]
 ```
-Submit `@quit` to quit and save.
+Press Ctrl-C to quit and save.
 Logs with an empty title will be save as `last_chat.json`
 ```
 User:
-@quit
-[Ctrl-D]
+[Ctrl-C]
 Enter a title for the conversation: log_test
 Conversation log saved to file: [YOUR_PATH]/GPTtoolbox/saves/log_test_20230315_172229.json
 ```
@@ -40,6 +39,6 @@ This is a test response from an AI language model called GPT-3. It is designed t
 
 Welcome to the GPT API! 
 Enter/Paste your content. Press Ctrl-D on a new line to submit.
-Submit '@quit' to exit.
+Press Ctrl-C to quit
 User:
 ```
