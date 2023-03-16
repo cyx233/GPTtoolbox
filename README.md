@@ -13,6 +13,8 @@ pip install -r requirements.txt
     xxxxxxxxx[YOUR_API_KEY]
     ```
 
+**Important Action: Ensure the safety of your API keys. Never make them publicly accessible or upload them to a public repository.**
+
 ## Usage
 Available programs
 |Filename|Fucntion|
