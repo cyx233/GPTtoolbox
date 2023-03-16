@@ -34,8 +34,8 @@ Logs with an empty title will be save as `last_chat.json`
 ```
 User:
 [Ctrl-C]
-Enter a title for the conversation: log_test
-Conversation log saved to file: [YOUR_PATH]/GPTtoolbox/saves/log_test_20230315_172229.json
+Enter a title for the chat: log_test
+Chat log saved to file: [YOUR_PATH]/GPTtoolbox/saves/log_test_20230315_172229.json
 ```
 Reload log by `-f`, print it by `-p`
 ```
