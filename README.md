@@ -13,6 +13,12 @@ xx-xxxxxxx[YOUR_API_KEY]
 ```
 
 ## Usage
+Available programs
+|Filename|Fucntion|
+|--|--|
+|src/text_chat.py| Text conversation|
+
+
 Enter/Paste your content. Press Ctrl-D on a new line to submit.
 ```
 User:
