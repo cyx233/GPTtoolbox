@@ -70,6 +70,7 @@ def main(args):
                     print("User:\n" + m['content'])
                 elif m['role']=="assistant":
                     print("AI:\n" + m['content'])
+            print("\n")
     conversation_title = ""
     os.makedirs(save_dir, exist_ok=True)
     print("Welcome to the GPT API! Type '@quit' to exit.")
@@ -78,9 +79,11 @@ def main(args):
         message = get_input()
         if message.lower() == "@quit":
             # Prompt for conversation title and save conversation log to file
-            while not conversation_title:
-                conversation_title = input("Enter a title for the conversation: ")
-            filename = os.path.join(save_dir,time.strftime(f"{conversation_title}_%Y%m%d_%H%M%S.json"))
+            conversation_title = input("Enter a title for the conversation: ")
+            if conversation_title:
+                filename = os.path.join(save_dir,time.strftime(f"{conversation_title}_%Y%m%d_%H%M%S.json"))
+            else:
+                filename = os.path.join(save_dir,"last_chat.json")
             with open(filename, 'w') as f:
                 json.dump(chat_log, f)
             print("Conversation log saved to file: " + filename)
