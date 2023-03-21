@@ -3,6 +3,7 @@ scripts for various models of GPT
 
 ## Requirements
 ```bash
+sudo apt-get install qtbase5-dev
 pip install -r requirements.txt
 ```
 
@@ -22,4 +23,4 @@ pip install -r requirements.txt
 |src/stream_chat.py| Text conversation|
 
 ### stream_chat.py
-![](demo/stream_chat.png)
+![](demo/stream_chat.png")
