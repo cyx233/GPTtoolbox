@@ -37,7 +37,7 @@ class ChatWindow(QMainWindow):
         if succ:
             self.handle_message("User:\n")
             self.handle_message(message)
-            self.handle_message("\n")
+            self.handle_message("\n\n")
             self.message_input.clear()
 
     def handle_message(self, message):

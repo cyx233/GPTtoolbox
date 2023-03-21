@@ -1,7 +1,6 @@
 from constant import *
 from text_chat import text_chat
 from PySide2.QtCore import QThread, Signal 
-from PySide2.QtWidgets import QApplication
 
 import os
 import sys
@@ -24,7 +23,7 @@ class StreamThread(QThread):
                 continue
             self.message_received.emit(chunk_message)
             collected_messages.append(chunk_message)
-        self.message_received.emit("\n")
+        self.message_received.emit("\n\n")
         return "".join(collected_messages)
 
     def run(self):

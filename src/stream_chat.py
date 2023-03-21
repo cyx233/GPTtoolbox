@@ -1,7 +1,11 @@
 from constant import *
 from chat_gui import ChatWindow
 from text_chat import TextLog
+from stream_client import StreamClient, StreamThread
 
+from PySide2.QtWidgets import QApplication
+
+import sys
 import tiktoken
 import openai
 import argparse
