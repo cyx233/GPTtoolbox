@@ -1,5 +1,5 @@
 import sys
-from PySide2.QtWidgets import  QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QPushButton
+from PySide2.QtWidgets import  QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QPushButton, QApplication
 from PySide2.QtCore import Qt 
 from PySide2.QtGui import QTextCursor
 import threading
@@ -31,16 +31,26 @@ class ChatWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.message_input.setFocus()
 
+        self.message_log.setStyleSheet("font-size: 12pt")
+        self.message_input.setStyleSheet("font-size: 12pt")
+
+    def resizeEvent(self, event):
+        # Adjust font size based on window height
+        height = self.height()
+        font_size = height // 30  # Adjust as needed
+        self.message_input.setStyleSheet(f"font-size: {font_size}pt")
+        self.message_log.setStyleSheet(f"font-size: {font_size}pt")
+
     def handle_send(self):
         message = self.message_input.text()
         self.handle_message("User:\n")
         self.handle_message(message)
         self.handle_message("\n\n")
+        self.message_input.clear()
+        QApplication.processEvents()
         succ = self.chat_client.send(message)
-        if succ:
-            self.message_input.clear()
-        else:
-            self.handle_message("Send Failed!\n")
+        if not succ:
+            self.handle_message("Send Failed!\n\n")
 
     def handle_message(self, message):
         self.message_log.moveCursor(QTextCursor.End)
