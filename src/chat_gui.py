@@ -33,12 +33,14 @@ class ChatWindow(QMainWindow):
 
     def handle_send(self):
         message = self.message_input.text()
+        self.handle_message("User:\n")
+        self.handle_message(message)
+        self.handle_message("\n\n")
         succ = self.chat_client.send(message)
         if succ:
-            self.handle_message("User:\n")
-            self.handle_message(message)
-            self.handle_message("\n\n")
             self.message_input.clear()
+        else:
+            self.handle_message("Send Failed!\n")
 
     def handle_message(self, message):
         self.message_log.moveCursor(QTextCursor.End)
