@@ -1,6 +1,6 @@
 from utils import keyfile
 from gui import ChatWindow
-from chat import TextLog, StreamClient, StreamThread
+from backend.chat import TextLog, StreamClient, StreamThread
 
 from PySide2.QtWidgets import QApplication
 import sys
