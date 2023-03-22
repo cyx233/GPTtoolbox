@@ -65,11 +65,11 @@ def db_text_chat(message, filenames, chat_log:TextLog, chat_params, encoding, pr
 
     similarities = np.dot(keys, query) / (np.linalg.norm(keys, axis=1) * np.linalg.norm(query))
     sorted_indices = np.argsort(similarities)[::-1]  # sort indices in descending order
-    cur_file = 0
-    begin = 0
     relevent_doc = TextLog()
     relevent_doc.append('user', "You must answer me according to the following documents:")
     for i in sorted_indices:
+        begin = 0
+        cur_file = 0
         while begin + num_chunks[cur_file] <= i:
             begin += num_chunks[cur_file]
             cur_file += 1
@@ -92,7 +92,7 @@ def db_text_chat(message, filenames, chat_log:TextLog, chat_params, encoding, pr
         return 0, [], None
 
     response = openai.ChatCompletion.create(
-        messages = relevent_doc.get_logs() + chat_log.get_logs(),
+        messages = relevent_doc.get_logs()[::-1] + chat_log.get_logs(),
         **chat_params
     )
 
