@@ -1,5 +1,5 @@
 # GPTtoolbox
-scripts for various models of GPT
+app with GUI for various models of GPT
 
 ## Requirements
 ```bash
