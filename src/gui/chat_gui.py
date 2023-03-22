@@ -36,15 +36,12 @@ class ChatWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.message_input.setFocus()
 
-        self.message_log.setStyleSheet("font-size: 12pt")
-        self.message_input.setStyleSheet("font-size: 12pt")
+        self.central_widget.setStyleSheet("font-size: 12pt")
 
     def resizeEvent(self, event):
         # Adjust font size based on window height
-        height = self.height()
-        font_size = height // 30  # Adjust as needed
-        self.message_input.setStyleSheet(f"font-size: {font_size}pt")
-        self.message_log.setStyleSheet(f"font-size: {font_size}pt")
+        font_size = min(max(self.height() // 30, 1), 20)
+        self.central_widget.setStyleSheet(f"font-size: {font_size}pt")
 
     def handle_send(self):
         message = self.message_input.text()
