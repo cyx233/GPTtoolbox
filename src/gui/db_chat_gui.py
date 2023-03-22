@@ -62,6 +62,18 @@ class DatabaseChatWindow(ChatWindow):
         self.central_widget.setLayout(layout)
         self.setCentralWidget(self.central_widget)
 
+    def handle_send(self):
+        message = self.message_input.toPlainText()
+        selected_items = [item.text() for item in self.database_list.selectedItems()]
+        self.handle_message("User:\n")
+        self.handle_message(message)
+        self.handle_message("\n\n")
+        self.message_input.clear()
+        QApplication.processEvents()
+        succ = self.chat_client.send(message, selected_items)
+        if not succ:
+            self.handle_message("Send Failed!\n\n")
+
     def handle_process(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog

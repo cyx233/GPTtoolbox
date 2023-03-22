@@ -51,7 +51,10 @@ class TextLog:
     
     def pop(self):
         self._begin = 0
-        return self._data[-1]
+        return self._data.pop()
+    
+    def revert_append(self):
+        return self._data.pop()
     
     def save(self,filename):
         with open(filename, 'w') as f:

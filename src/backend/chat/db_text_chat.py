@@ -1,7 +1,7 @@
 import lmdb
 import numpy as np
 import openai
-from utils import env, get_config
+from utils import env, get_config, increase_usage
 from .text_chat import TextLog
 
 # Initialize OpenAI API key
@@ -22,15 +22,17 @@ def get_embeddings_for_filenames(filenames):
     Get the embedding matrix for the given filenames from the LMDB database.
     """
     embeddings = []
+    num_chunks = []
     with env.begin(write=False) as txn:
         for filename in filenames:
             embedding_key = f"{filename}:embeddings".encode()
             embedding_bytes = txn.get(embedding_key, db=embedding_db)
             embedding = np.frombuffer(embedding_bytes, dtype=np.float32).reshape(-1, 1536)
             embeddings.append(embedding)
-    return np.vstack(embeddings)
+            num_chunks.append(embedding.shape[0])
+    return np.vstack(embeddings), num_chunks
 
-def get_text_chunk_for_index(filename, index):
+def get_text_for_index(filename, index):
     """
     Get the text chunk for the given filename and index from the LMDB database.
     """
@@ -39,54 +41,41 @@ def get_text_chunk_for_index(filename, index):
         text = txn.get(text_key, db=chunk_db)
     return text.decode()
 
-def add_chunks_to_prompt(prompt, embeddings, prompt_limit):
-    """
-    Add chunks to the prompt until the maximum token limit is reached.
-    Returns the modified prompt and the number of tokens in the prompt.
-    """
-    num_tokens = len(openai.Completion.create(prompt=prompt)["choices"][0]["text"].split())
-    i = 0
-    while i < len(embeddings) and num_tokens < prompt_limit:
-        chunk_text = get_text_chunk_for_index(filename, i)
-        prompt += chunk_text
-        num_tokens += len(chunk_text.split())
-        i += 1
-    return prompt, num_tokens
 
-def build_prompt(message, filenames, prompt_limit):
-    """
-    Build a prompt for the given message and filenames.
-    """
-    embeddings = get_embeddings_for_filenames(filenames)
-    # Calculate the similarity between the message embedding and the embeddings for the files
-    similarity_scores = openai.VectorSimilarity.list(vector=message, vectors=list(embeddings))
-    # Get the indices of the top 100 most similar embeddings
-    top_indices = [score["vector_index"] for score in similarity_scores["data"][:100]]
-    # Get the text chunks for the top 100 embeddings and add them to the prompt
-    prompt = ""
-    for index in top_indices:
-        filename = filenames[index]
-        chunk_text = get_text_chunk_for_index(filename, 0)
-        prompt += chunk_text
-        # If the prompt is still under the token limit, add more chunks
-        if len(prompt.split()) < prompt_limit:
-            prompt, _ = add_chunks_to_prompt(prompt, embeddings[index:], prompt_limit)
-    return prompt
+def get_num_chunks(filename):
+    with env.begin(write=False) as txn:
+        num_key = f"{filename}".encode()
+        num_chunks = txn.get(num_key, db=file_db)
+    return int(num_chunks.decode())
+
 
 # Define the function to send a message to the chatbot and get a response
 def db_text_chat(message, filenames, chat_log:TextLog, chat_params, encoding, prompt_limit=2048):
-    
-    chat_log.append("user", message)
+    model = chat_params['model']
+    response = openai.Embedding.create(model=model, input=message)
+    query = np.array(response['data'][0]["embedding"])
+    increase_usage(model, response['usage']['prompt_tokens'])
 
-    num_prompt = chat_log.num_tokens_from_messages(encoding)
-    # limit of input length
-    while num_prompt >= prompt_limit:
-        chat_log.popleft()
+    keys = get_embeddings_for_filenames(filenames)
+
+    similarities = np.dot(keys, query) / (np.linalg.norm(keys, axis=1) * np.linalg.norm(query))
+    sorted_indices = np.argsort(similarities)[::-1]  # sort indices in descending order
+    cur_file = 0
+    begin = 0
+    for i in sorted_indices:
+        num_chunks = get_num_chunks(filenames[cur_file])
+        while begin + num_chunks <= i:
+            begin += num_chunks
+            cur_file += 1
+            num_chunks = get_num_chunks(filenames[cur_file])
+        text = get_text_for_index(filename[cur_file], i - begin)
+        chat_log.append('user', text)
         num_prompt = chat_log.num_tokens_from_messages(encoding)
-
-    if len(chat_log) == 0:
-        chat_log.pop()
-        return 0, [], None
+        # limit of input length
+        if num_prompt >= prompt_limit:
+            chat_log.revert_append()
+            num_prompt = chat_log.num_tokens_from_messages(encoding)
+            break
 
     response = openai.ChatCompletion.create(
         messages=chat_log.get_logs(),
