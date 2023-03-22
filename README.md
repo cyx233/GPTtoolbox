@@ -9,11 +9,8 @@ pip install -r requirements.txt
 
 ## API key
 1. Get Your [Openai API keys](https://platform.openai.com/account/api-keys)
-2. Paste it in config.ini
-    ```
-    [settings]
-    api_key = xxxxxxxxx[YOUR_API_KEY]
-    ```
+2. Paste it in config 
+    ![](demo/config.png)
 
 **Important Action: Ensure the safety of your API keys. Never make them publicly accessible or upload them to a public repository.**
 
