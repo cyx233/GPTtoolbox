@@ -21,7 +21,12 @@ python src/main.py
 ### Available programs
 |Name|Filename|Fucntion|
 |--|--|--|
-|Chat|src/stream_chat.py| Text conversation|
+|Chat|src/app/stream_chat.py| Text conversation|
+|Chat On DB|src/app/db_chat.py| Text conversation according to background knowledge|
 
-### Chat
-![](demo/stream_chat.png)
+### Chat on DB
+![](demo/db_chat.png)
+
+Use `Process` to load documents to `LMDB`.
+
+Click filenames in the right list to set it as background knowledge.
