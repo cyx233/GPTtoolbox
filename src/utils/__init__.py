@@ -1,1 +1,1 @@
-from .config import config_file, init_saves, init_usage, increase_usage, get_api_key
+from .config import config_file, init_saves, init_usage, increase_usage, get_api_key, get_font_size

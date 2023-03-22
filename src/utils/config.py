@@ -10,6 +10,11 @@ def get_api_key():
     config.read(config_file)
     return config.get('settings', 'api_key')
 
+def get_font_size():
+    config = configparser.ConfigParser()
+    config.read(config_file)
+    return config.get('settings', 'font_size')
+
 
 def init_usage(usage_file, old_path=None):
     config = configparser.ConfigParser()
@@ -64,6 +69,7 @@ def init_config():
 
     config['settings']['save_dir'] = init_saves(save_dir)
     config['settings']['usage_file'] = init_usage(usage_file, usage_file)
+    config['settings']['font_size'] = config.get('settings', 'font_size', fallback=18)
 
     with open(config_file, "w") as f:
         config.write(f)

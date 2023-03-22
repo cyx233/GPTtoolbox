@@ -5,6 +5,7 @@ from PySide2.QtWidgets import  (QMainWindow, QWidget, QVBoxLayout,
 from PySide2.QtCore import Qt 
 from PySide2.QtGui import QTextCursor
 import threading
+from utils import get_font_size
 
 class ChatWindow(QMainWindow):
     def __init__(self, chat_client, chat_thread):
@@ -18,7 +19,7 @@ class ChatWindow(QMainWindow):
         self.setWindowTitle("Chat")
         self.setMinimumSize(1200, 800)
         self.central_widget = QWidget()
-        self.central_widget.setStyleSheet(f"font-size: 18pt")
+        self.central_widget.setStyleSheet(f"font-size: {get_font_size()}pt")
 
         self.message_log = QTextEdit()
         self.message_log.setReadOnly(True)

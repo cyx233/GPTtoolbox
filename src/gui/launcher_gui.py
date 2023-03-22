@@ -20,20 +20,24 @@ class ConfigDialog(QDialog):
         self.api_key_label = QLabel("API Key:")
         self.save_dir_label = QLabel("Saves Location")
         self.usage_file_label = QLabel("Usage Record")
+        self.font_size_lable = QLabel("Font Size")
         labels = [
             self.api_key_label,
             self.save_dir_label,
             self.usage_file_label,
+            self.font_size_lable
         ]
 
         self.api_key_edit = QLineEdit()
         self.save_dir_edit = QLineEdit()
         self.usage_file_edit = QLineEdit()
+        self.font_size_edit = QLineEdit()
 
         edits = [
             self.api_key_edit,
             self.save_dir_edit,
             self.usage_file_edit,
+            self.font_size_edit,
         ]
 
         for label, edit in zip(labels, edits):
@@ -57,11 +61,14 @@ class ConfigDialog(QDialog):
         api_key = settings.value("settings/api_key", "")
         save_dir = settings.value("settings/save_dir", "save_dir")
         usage_file = settings.value("settings/usage_file", "usage_file")
+        font_size = settings.value("settings/font_size", "18")
 
         self.old_path = usage_file
         self.api_key_edit.setText(api_key)
         self.save_dir_edit.setText(save_dir)
         self.usage_file_edit.setText(usage_file)
+        self.font_size_edit.setText(font_size)
+        self.setStyleSheet(f"font-size: {font_size}pt")
 
         button_layout = QHBoxLayout()
 
@@ -82,14 +89,14 @@ class ConfigDialog(QDialog):
         api_key = self.api_key_edit.text().strip()
         save_dir = self.save_dir_edit.text().strip()
         usage_file = self.usage_file_edit.text().strip()
+        font_size = self.font_size_edit.text().strip()
+        settings = QSettings(config_file, QSettings.IniFormat)
 
         if api_key:
-            settings = QSettings(config_file, QSettings.IniFormat)
             settings.setValue("settings/api_key", api_key)
         else:
             QMessageBox.warning(self, "Warning", "API Key cannot be empty")
 
-        settings = QSettings(config_file, QSettings.IniFormat)
         settings.setValue("settings/save_dir", save_dir)
         init_saves(save_dir)
 
@@ -97,6 +104,8 @@ class ConfigDialog(QDialog):
         settings.setValue("settings/usage_file", usage_file)
         init_usage(usage_file, self.old_path)
 
+        settings.setValue("settings/font_size", font_size)
+        self.setStyleSheet(f"font-size: {font_size}pt")
         super().accept()
 
     def select_save_dir(self):
@@ -133,21 +142,16 @@ class LauncherWindow(QMainWindow):
         layout.addWidget(chat_button)
         layout.addWidget(config_button)
 
+        settings = QSettings(config_file, QSettings.IniFormat)
+
         # Add buttons for other programs here
         self.central_widget.setLayout(layout)
+        self.central_widget.setStyleSheet(f"font-size: {settings.value('settings/font_size', '18')}pt")
     
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        # Adjust font size based on window height
-        font_size = min(max(self.height() // 15, 1), 20)
-        font = self.central_widget.font()
-        font.setPointSize(font_size)
-        self.central_widget.setFont(font)
-
     def launch_stream_chat(self):
         stream_chat()
 
     def show_config_dialog(self):
         dialog = ConfigDialog(parent=self)
         if dialog.exec_() == QDialog.Accepted:
-            QMessageBox.information(self, "Information", "Config saved.")
+            QMessageBox.information(self, "Information", "Config saved. Some settings require reloading.")
