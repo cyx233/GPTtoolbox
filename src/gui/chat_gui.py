@@ -14,7 +14,7 @@ class ChatWindow(QMainWindow):
 
     def setup_ui(self):
         self.setWindowTitle("Chat")
-        self.setMinimumSize(600, 400)
+        self.setMinimumSize(1200, 800)
         self.central_widget = QWidget()
 
         self.message_log = QTextEdit()

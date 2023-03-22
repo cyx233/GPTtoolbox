@@ -9,7 +9,7 @@ class LauncherWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Program Launcher")
-        self.setMinimumSize(300, 200)
+        self.setMinimumSize(400, 600)
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
