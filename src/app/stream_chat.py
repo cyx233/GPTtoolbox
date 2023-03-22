@@ -1,8 +1,8 @@
 from utils import api_key
 from gui import ChatWindow
 from backend.chat import TextLog, StreamClient, StreamThread
+from PySide2.QtCore import QEventLoop
 
-from PySide2.QtWidgets import QApplication
 import sys
 import tiktoken
 import openai
@@ -25,8 +25,6 @@ def stream_chat(model="gpt-3.5-turbo", load_log="", user=""):
     except KeyError:
         encoding = tiktoken.get_encoding("cl100k_base")
     
-    app = QApplication()
-
     chat_log = TextLog(load_log)
     client = StreamClient(chat_log, chat_params, encoding)
     chat_thread = StreamThread(client)
@@ -36,5 +34,6 @@ def stream_chat(model="gpt-3.5-turbo", load_log="", user=""):
     chat_thread.start()
     # show the chat window
     chat_window.show()
-    # run the application event loop
-    sys.exit(app.exec_())
+
+    loop = QEventLoop()
+    loop.exec_()
