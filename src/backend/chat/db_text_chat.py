@@ -67,6 +67,7 @@ def db_text_chat(message, filenames, chat_log:TextLog, chat_params, encoding, pr
     sorted_indices = np.argsort(similarities)[::-1]  # sort indices in descending order
     relevent_doc = TextLog()
     relevent_doc.append('user', "You must answer me according to the following documents:")
+    # TODO: Binary Search
     for i in sorted_indices:
         begin = 0
         cur_file = 0
