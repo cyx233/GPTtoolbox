@@ -17,9 +17,10 @@ if not os.path.isabs(save_dir):
     save_dir = os.path.normpath(os.path.join(src_dir, save_dir))
 
 if not os.path.isabs(usage_file):
-    save_dir = os.path.normpath(os.path.join(src_dir, usage_file))
+    usage_file = os.path.normpath(os.path.join(src_dir, usage_file))
 
+os.makedirs(save_dir,exist_ok=True)
+os.makedirs(os.path.dirname(usage_file), exist_ok=True)
 if not os.path.exists(usage_file):
     with open(usage_file,"w") as f:
         json.dump({}, f)
-os.makedirs(save_dir,exist_ok=True)
