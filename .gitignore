@@ -131,3 +131,4 @@ dmypy.json
 saves
 apikey
 usage.json
+db_file.lmdb

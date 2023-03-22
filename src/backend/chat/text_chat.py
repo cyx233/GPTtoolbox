@@ -63,9 +63,7 @@ class TextLog:
 
 
 # Define the function to send a message to the chatbot and get a response
-def text_chat(message, chat_log:TextLog, chat_params, encoding, prompt_func=None, prompt_limit=2048):
-    if prompt_func:
-        message = prompt_func(message)
+def text_chat(message, chat_log:TextLog, chat_params, encoding, prompt_limit=2048):
     chat_log.append("user", message)
 
     num_prompt = chat_log.num_tokens_from_messages(encoding)
