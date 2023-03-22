@@ -16,17 +16,22 @@ class ChatWindow(QMainWindow):
         self.setWindowTitle("Chat")
         self.setMinimumSize(600, 400)
         self.central_widget = QWidget()
+
         self.message_log = QTextEdit()
         self.message_log.setReadOnly(True)
+
         self.message_input = QLineEdit()
+
         self.send_button = QPushButton("Send")
         self.send_button.clicked.connect(self.handle_send)
+
         layout = QVBoxLayout()
         layout.addWidget(self.message_log)
         input_layout = QHBoxLayout()
         input_layout.addWidget(self.message_input)
         input_layout.addWidget(self.send_button)
         layout.addLayout(input_layout)
+
         self.central_widget.setLayout(layout)
         self.setCentralWidget(self.central_widget)
         self.message_input.setFocus()
