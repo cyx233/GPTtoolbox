@@ -5,6 +5,12 @@ import os
 src_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 config_file = os.path.join(src_dir,'config.ini')
 
+def get_api_key():
+    config = configparser.ConfigParser()
+    config.read(config_file)
+    return config.get('settings', 'api_key')
+
+
 def init_usage(usage_file, old_path=None):
     config = configparser.ConfigParser()
     config.read(config_file)
@@ -16,10 +22,10 @@ def init_usage(usage_file, old_path=None):
         old_path = os.path.normpath(os.path.join(src_dir, old_path))
 
     os.makedirs(os.path.dirname(usage_file), exist_ok=True)
-    if old_path:
+    try:
         with open(old_path) as f:
             usage = json.load(f)
-    else:
+    except:
         usage = {}
 
     with open(usage_file, "w") as f:
@@ -38,7 +44,7 @@ def init_saves(save_dir):
 def increase_usage(model, increase):
     config = configparser.ConfigParser()
     config.read(config_file)
-    usage_file = config.get('settings')
+    usage_file = config.get('settings', 'usage_file')
     with open(usage_file) as f:
         usage = json.load(f)
 

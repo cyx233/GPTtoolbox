@@ -1,3 +1,4 @@
+from utils import get_api_key
 from gui import ChatWindow
 from backend.chat import TextLog, StreamClient, StreamThread
 from PySide2.QtCore import QEventLoop
@@ -9,7 +10,7 @@ import argparse
 
 def stream_chat(model="gpt-3.5-turbo", load_log="", user=""):
     # Set your API key
-    openai.api_key = api_key.strip()
+    openai.api_key = get_api_key().strip()
 
     # Set the chatbot's parameters
     chat_params = {

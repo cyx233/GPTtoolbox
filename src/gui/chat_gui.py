@@ -1,5 +1,7 @@
 import sys
-from PySide2.QtWidgets import  QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QPushButton, QApplication
+from PySide2.QtWidgets import  (QMainWindow, QWidget, QVBoxLayout, 
+                                QHBoxLayout, QLineEdit, QTextEdit, 
+                                QPushButton, QApplication)
 from PySide2.QtCore import Qt 
 from PySide2.QtGui import QTextCursor
 import threading
@@ -16,14 +18,22 @@ class ChatWindow(QMainWindow):
         self.setWindowTitle("Chat")
         self.setMinimumSize(1200, 800)
         self.central_widget = QWidget()
+        self.central_widget.setStyleSheet(f"font-size: 18pt")
 
         self.message_log = QTextEdit()
         self.message_log.setReadOnly(True)
+        self.message_log.setAcceptRichText(False)
 
-        self.message_input = QLineEdit()
+        self.message_input = QTextEdit()
+        self.message_input.setAcceptRichText(False)
+        self.message_input.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.message_input.textChanged.connect(self.resize_input)
+        self.message_input.setPlaceholderText("Type your message here...")
+        self.message_input.setMaximumHeight(37)
 
         self.send_button = QPushButton("Send")
         self.send_button.clicked.connect(self.handle_send)
+        
 
         layout = QVBoxLayout()
         layout.addWidget(self.message_log)
@@ -34,17 +44,15 @@ class ChatWindow(QMainWindow):
 
         self.central_widget.setLayout(layout)
         self.setCentralWidget(self.central_widget)
-        self.message_input.setFocus()
 
-        self.central_widget.setStyleSheet("font-size: 12pt")
-
-    def resizeEvent(self, event):
-        # Adjust font size based on window height
-        font_size = min(max(self.height() // 30, 1), 20)
-        self.central_widget.setStyleSheet(f"font-size: {font_size}pt")
+    def resize_input(self):
+        doc = self.message_input.document()
+        height = doc.size().height()
+        height = min(height, self.height() // 2)
+        self.message_input.setMaximumHeight(height)
 
     def handle_send(self):
-        message = self.message_input.text()
+        message = self.message_input.toPlainText()
         self.handle_message("User:\n")
         self.handle_message(message)
         self.handle_message("\n\n")
