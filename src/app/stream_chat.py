@@ -1,4 +1,4 @@
-from utils import keyfile
+from utils import api_key
 from gui import ChatWindow
 from backend.chat import TextLog, StreamClient, StreamThread
 
@@ -10,8 +10,7 @@ import argparse
 
 def stream_chat(model="gpt-3.5-turbo", load_log="", user=""):
     # Set your API key
-    with open(keyfile) as f:
-        openai.api_key = f.read().strip()
+    openai.api_key = api_key.strip()
 
     # Set the chatbot's parameters
     chat_params = {
