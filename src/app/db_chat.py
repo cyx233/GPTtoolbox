@@ -1,6 +1,6 @@
 from utils import get_config
-from gui import ChatWindow
-from backend.chat import TextLog, StreamClient, StreamThread
+from gui import DatabaseChatWindow
+from backend.chat import TextLog, DatabaseChatClient, StreamThread
 from PySide2.QtCore import QEventLoop
 
 import sys
@@ -8,7 +8,7 @@ import tiktoken
 import openai
 import argparse
 
-def stream_chat(load_log="", user=""):
+def db_chat(model="gpt-3.5-turbo", load_log="", user=""):
     # Set your API key
     openai.api_key = get_config('settings', 'api_key').strip()
 
@@ -26,9 +26,9 @@ def stream_chat(load_log="", user=""):
         encoding = tiktoken.get_encoding("cl100k_base")
     
     chat_log = TextLog(load_log)
-    client = StreamClient(chat_log, chat_params, encoding)
+    client = DatabaseChatClient(chat_log, chat_params, encoding)
     chat_thread = StreamThread(client)
-    chat_window = ChatWindow(client, chat_thread)
+    chat_window = DatabaseChatWindow(client, chat_thread)
 
     # start the chat thread
     chat_thread.start()

@@ -18,20 +18,26 @@ class DBConfigDialog(QDialog):
         self.max_dbs_edit = QLineEdit()
         self.map_size_label = QLabel("Maximum Database Size (in bytes):")
         self.map_size_edit = QLineEdit()
+        self.chunk_size_label = QLabel("Text Chunk Size")
+        self.chunk_size_edit = QLineEdit()
 
         settings = QSettings(config_file, QSettings.IniFormat)
         max_dbs = settings.value("db_settings/max_dbs", 10)
         map_size = settings.value("db_settings/map_size", 1_000_000_000)
+        chunk_size = settings.value("db_settings/chunk_size", 2048)
 
         # Add default values to the widgets
         self.max_dbs_edit.setText(str(max_dbs))
         self.map_size_edit.setText(str(map_size))
+        self.chunk_size_edit.setText(str(chunk_size))
 
         # Add widgets to the layout
         layout.addWidget(self.max_dbs_label)
         layout.addWidget(self.max_dbs_edit)
         layout.addWidget(self.map_size_label)
         layout.addWidget(self.map_size_edit)
+        layout.addWidget(self.chunk_size_label)
+        layout.addWidget(self.chunk_size_edit)
 
         # Add OK and Cancel buttons
         button_layout = QHBoxLayout()
@@ -60,6 +66,10 @@ class DBConfigDialog(QDialog):
             settings.setValue("db_settings/map_size", int(map_size))
         else:
             QMessageBox.warning(self, "Warning", "map_size is not a number")
+        if chunk_size and chunk_size.isdigit():
+            settings.setValue("db_settings/chunk_size", int(chunk_size))
+        else:
+            QMessageBox.warning(self, "Warning", "chunk_size is not a number")
 
         env.set_mapsize(int(map_size))
 

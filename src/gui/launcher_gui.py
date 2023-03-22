@@ -1,8 +1,8 @@
 from PySide2.QtWidgets import ( QMainWindow, QWidget, QVBoxLayout, 
                                 QHBoxLayout, QPushButton, QDialog, 
-                                QMessageBox)
+                                QMessageBox, QFileDialog)
 from PySide2.QtCore import QSettings
-from app import stream_chat
+from app import stream_chat, db_chat
 from utils import config_file
 
 from .chat_gui import ChatWindow
@@ -23,13 +23,14 @@ class LauncherWindow(QMainWindow):
         chat_button = QPushButton("Chat")
         chat_button.clicked.connect(self.launch_stream_chat)
 
-        chat_button = QPushButton("Chat on DB")
-        chat_button.clicked.connect(self.launch_db_chat)
+        db_chat_button = QPushButton("Chat on DB")
+        db_chat_button.clicked.connect(self.launch_db_chat)
 
         config_button = QPushButton("Config")
         config_button.clicked.connect(self.show_config_dialog)
 
         layout.addWidget(chat_button)
+        layout.addWidget(db_chat_button)
         layout.addWidget(config_button)
 
         settings = QSettings(config_file, QSettings.IniFormat)
@@ -42,7 +43,7 @@ class LauncherWindow(QMainWindow):
         stream_chat()
 
     def launch_db_chat(self):
-        pass
+        db_chat()
     
     def show_config_dialog(self):
         dialog = ConfigDialog(parent=self)

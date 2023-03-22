@@ -2,6 +2,7 @@ import lmdb
 import numpy as np
 import openai
 from utils import env, get_config
+from .text_chat import TextLog
 
 # Initialize OpenAI API key
 openai.api_key = get_config('settings', 'api_key')
@@ -9,15 +10,12 @@ openai.api_key = get_config('settings', 'api_key')
 # Initialize LMDB database
 
 # Open the databases for text and embeddings
-with env.begin(write=False) as txn:
-    text_db = txn.open_db(b'text_database')
-    embedding_db = txn.open_db(b'embedding_database')
+file_db = env.open_db(b'file_database')
+chunk_db = env.open_db(b'chunk_database')
+embedding_db = env.open_db(b'embedding_database')
 
 # Define the chunk size for splitting the text
-chunk_size = 2048
-
-# Define the maximum number of tokens in the prompt
-max_tokens = 2048
+chunk_size = get_config('db_settings', 'chunk_size')
 
 def get_embeddings_for_filenames(filenames):
     """
@@ -38,24 +36,24 @@ def get_text_chunk_for_index(filename, index):
     """
     with env.begin(write=False) as txn:
         text_key = f"{filename}:{index}".encode()
-        text = txn.get(text_key, db=text_db)
+        text = txn.get(text_key, db=chunk_db)
     return text.decode()
 
-def add_chunks_to_prompt(prompt, embeddings, max_tokens):
+def add_chunks_to_prompt(prompt, embeddings, prompt_limit):
     """
     Add chunks to the prompt until the maximum token limit is reached.
     Returns the modified prompt and the number of tokens in the prompt.
     """
     num_tokens = len(openai.Completion.create(prompt=prompt)["choices"][0]["text"].split())
     i = 0
-    while i < len(embeddings) and num_tokens < max_tokens:
+    while i < len(embeddings) and num_tokens < prompt_limit:
         chunk_text = get_text_chunk_for_index(filename, i)
         prompt += chunk_text
         num_tokens += len(chunk_text.split())
         i += 1
     return prompt, num_tokens
 
-def build_prompt(message, filenames):
+def build_prompt(message, filenames, prompt_limit):
     """
     Build a prompt for the given message and filenames.
     """
@@ -71,12 +69,12 @@ def build_prompt(message, filenames):
         chunk_text = get_text_chunk_for_index(filename, 0)
         prompt += chunk_text
         # If the prompt is still under the token limit, add more chunks
-        if len(prompt.split()) < max_tokens:
-            prompt, _ = add_chunks_to_prompt(prompt, embeddings[index:], max_tokens)
+        if len(prompt.split()) < prompt_limit:
+            prompt, _ = add_chunks_to_prompt(prompt, embeddings[index:], prompt_limit)
     return prompt
 
 # Define the function to send a message to the chatbot and get a response
-def db_text_chat(message, chat_log:TextLog, chat_params, encoding, prompt_limit=2048):
+def db_text_chat(message, filenames, chat_log:TextLog, chat_params, encoding, prompt_limit=2048):
     
     chat_log.append("user", message)
 

@@ -1,4 +1,3 @@
-import sys
 from PySide2.QtWidgets import  (QMainWindow, QWidget, QVBoxLayout, 
                                 QHBoxLayout, QLineEdit, QTextEdit, 
                                 QPushButton, QApplication)

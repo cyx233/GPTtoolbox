@@ -80,6 +80,11 @@ def init_config():
         config['db_settings'] = {}
     config['db_settings']['max_dbs'] = config.get('db_settings', 'max_dbs', fallback='10')
     config['db_settings']['map_size'] = config.get('db_settings', 'map_size', fallback='1000000000')
+    config['db_settings']['chunk_size'] = config.get('db_settings', 'chunk_size', fallback='2048')
+    if 'model' not in config:
+        config['model'] = {}
+    config['model']['llm'] = config.get('model', 'chunk_size', fallback='gpt-3.5-turbo')
+    config['model']['embedding'] = config.get('model', 'chunk_size', fallback='text-embedding-ada-002')
 
     with open(config_file, "w") as f:
         config.write(f)

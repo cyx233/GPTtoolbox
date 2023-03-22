@@ -2,10 +2,10 @@ import pdfplumber
 import lmdb
 import numpy as np
 import openai
-from PySide2.QtWidgets import QApplication, QFileDialog, QMessageBox
+from PySide2.QtWidgets import QApplication, QFileDialog, QMessageBox, QProgressBar, QWidget, QVBoxLayout
 from PySide2.QtCore import QSettings
 import os
-from utils import get_config, env
+from utils import get_config, env, increase_usage
 
 # Initialize OpenAI API key
 openai.api_key = get_config('settings', 'api_key')
@@ -14,9 +14,9 @@ openai.api_key = get_config('settings', 'api_key')
 db_path = get_config('settings', 'db_dir')
 
 # Create two databases: one for storing text and one for storing embeddings
-with env.begin(write=True) as txn:
-    text_db = txn.open_db(b'text_database')
-    embedding_db = txn.open_db(b'embedding_database')
+file_db = env.open_db(b'file_database')
+chunk_db = env.open_db(b'chunk_database')
+embedding_db = env.open_db(b'embedding_database')
 
 # Define the chunk size for splitting the text
 chunk_size = 2048
@@ -41,16 +41,21 @@ def split_text_to_chunks(text):
         chunks.append(text[i:i+chunk_size])
     return chunks
 
-def get_embeddings_from_chunks(chunks):
+def get_embeddings_from_chunks(chunks, progress_callback):
     """
     Get embeddings for the given text chunks using OpenAI API.
     Returns a list of numpy arrays.
     """
     embeddings = []
-    for chunk in chunks:
-        response = openai.Embedding.create(engine="ada", input=chunk)
-        embedding = np.array(response["embedding"])
+    model = get_config('model', 'embedding')
+    import time
+    for i, chunk in enumerate(chunks):
+        response = openai.Embedding.create(model=model, input=chunk)
+        embedding = np.array(response['data'][0]["embedding"])
         embeddings.append(embedding)
+        increase_usage(model, response['usage']['prompt_tokens'])
+        progress_callback(i / len(chunks))
+        QApplication.processEvents()
     return embeddings
 
 def store_chunks_in_database(file_name, text_chunks, embedding_chunks):
@@ -61,10 +66,9 @@ def store_chunks_in_database(file_name, text_chunks, embedding_chunks):
     with env.begin(write=True) as txn:
         # Store the text chunks for the file
         text_key = f"{file_name}".encode()
-        txn.put(text_key, str(len(text_chunks)).encode(), db=text_db)
+        txn.put(text_key, str(len(text_chunks)).encode(), db=file_db)
         for i, text_chunk in enumerate(text_chunks):
-            txn.put(f"{file_name}:{i}".encode(), text_chunk.encode(), db=text_db)
-
+            txn.put(f"{file_name}:{i}".encode(), text_chunk.encode(), db=chunk_db)
         # Store the embedding matrix for the file
         embedding_key = f"{file_name}:embeddings".encode()
         embeddings = np.vstack(embedding_chunks)
@@ -74,7 +78,30 @@ def process_file(file_path):
     """
     Read the PDF file, extract text, split into chunks, get embeddings, and store in database.
     """
-    text = extract_text_from_pdf(file_path)
+    # Create a progress bar widget
+    progress_bar = QProgressBar()
+    # Set the progress bar to have a range from 0 to 100
+    progress_bar.setRange(0, 100)
+    # Connect the progress bar to the `valueChanged` signal of its QProgressBar
+    progress_bar.valueChanged.connect(lambda value: progress_bar.setFormat(f"{value}%"))
+
+    progress_widget = QWidget()
+    progress_widget.setWindowTitle("Processing...")
+    progress_widget_layout = QVBoxLayout()
+    progress_widget_layout.addWidget(progress_bar)
+    progress_widget.setLayout(progress_widget_layout)
+    progress_widget.show()
+
+    def progress_callback(progress):
+        progress_bar.setValue(int(progress * 100))
+
+
+    file_extension = os.path.splitext(file_path)[1]
+    if file_extension == '.pdf':
+        text = extract_text_from_pdf(file_path)
+    else:
+        with open(file_path) as f:
+            text = f.read()
     text_chunks = split_text_to_chunks(text)
-    embedding_chunks = get_embeddings_from_chunks(text_chunks)
-    store_chunks_in_database(os.path.basename(fila_path), text_chunks, embedding_chunks)
+    embedding_chunks = get_embeddings_from_chunks(text_chunks, progress_callback)
+    store_chunks_in_database(os.path.basename(file_path), text_chunks, embedding_chunks)
