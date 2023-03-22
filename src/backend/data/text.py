@@ -18,9 +18,6 @@ file_db = env.open_db(b'file_database')
 chunk_db = env.open_db(b'chunk_database')
 embedding_db = env.open_db(b'embedding_database')
 
-# Define the chunk size for splitting the text
-chunk_size = 2048
-
 def extract_text_from_pdf(file_path):
     """
     Extract text from a PDF file and return as a string.
@@ -36,9 +33,12 @@ def split_text_to_chunks(text):
     Split the given text into chunks with proper chunk size for OpenAI embedding API.
     Returns a list of text chunks.
     """
+    chunk_size = int(get_config('db_settings', 'chunk_size'))
     chunks = []
     for i in range(0, len(text), chunk_size):
-        chunks.append(text[i:i+chunk_size])
+        data = text[i:i+chunk_size]
+        if data:
+            chunks.append(data)
     return chunks
 
 def get_embeddings_from_chunks(chunks, progress_callback):
@@ -103,5 +103,7 @@ def process_file(file_path):
         with open(file_path) as f:
             text = f.read()
     text_chunks = split_text_to_chunks(text)
+    if not text_chunks:
+        return
     embedding_chunks = get_embeddings_from_chunks(text_chunks, progress_callback)
     store_chunks_in_database(os.path.basename(file_path), text_chunks, embedding_chunks)
