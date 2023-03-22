@@ -1,4 +1,4 @@
-from utils import usage_file
+from utils import increase_usage
 from .text_chat import text_chat
 from PySide2.QtCore import QThread, Signal 
 
@@ -47,14 +47,10 @@ class StreamClient:
         with self._lock:
             self.chat_log.append("assistant", sentence)
 
-            with open(usage_file) as f:
-                usage = json.load(f)
-            if self.chat_params['model'] not in usage:
-                usage[self.chat_params['model']] = 0
-            usage[self.chat_params['model']] += self._num_prompt + len(self.encoding.encode(sentence))
-            with open(usage_file, "w") as f:
-                json.dump(usage, f)
-
+            increase_usage(
+                self.chat_params['model'], 
+                self._num_prompt+len(self.encoding.encode(sentence))
+                )
             self._response = None
             self._num_prompt = 0
     

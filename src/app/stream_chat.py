@@ -1,4 +1,3 @@
-from utils import api_key
 from gui import ChatWindow
 from backend.chat import TextLog, StreamClient, StreamThread
 from PySide2.QtCore import QEventLoop
