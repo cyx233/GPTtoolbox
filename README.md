@@ -27,4 +27,4 @@ python src/main.py
 |Chat|src/stream_chat.py| Text conversation|
 
 ### Chat
-![](demo/stream_chat.png")
+![](demo/stream_chat.png)
