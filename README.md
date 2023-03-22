@@ -18,10 +18,13 @@ pip install -r requirements.txt
 **Important Action: Ensure the safety of your API keys. Never make them publicly accessible or upload them to a public repository.**
 
 ## Usage
+```
+python src/main.py
+```
 ### Available programs
-|Filename|Fucntion|
-|--|--|
-|src/stream_chat.py| Text conversation|
+|Name|Filename|Fucntion|
+|--|--|--|
+|Chat|src/stream_chat.py| Text conversation|
 
-### stream_chat.py
+### Chat
 ![](demo/stream_chat.png")
