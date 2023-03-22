@@ -1,5 +1,5 @@
-from constant import *
-from text_chat import text_chat
+from utils import usage_file
+from .text_chat import text_chat
 from PySide2.QtCore import QThread, Signal 
 
 import os

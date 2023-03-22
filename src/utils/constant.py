@@ -1,5 +1,6 @@
 import os
-src_dir = os.path.dirname(__file__)
+import json
+src_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 save_dir = os.path.normpath(os.path.join(src_dir, "../saves"))
 
 usage_file = os.path.join(src_dir,"usage.json")

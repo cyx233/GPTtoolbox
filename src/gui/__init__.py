@@ -1,1 +1,1 @@
-from chat_gui import ChatWindow
+from .chat_gui import ChatWindow

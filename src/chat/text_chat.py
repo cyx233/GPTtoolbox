@@ -1,5 +1,4 @@
 import tiktoken
-from constant import *
 import openai
 
 class TextLog:

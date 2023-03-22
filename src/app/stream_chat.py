@@ -1,4 +1,4 @@
-from constant import *
+from utils import keyfile
 from gui import ChatWindow
 from chat import TextLog, StreamClient, StreamThread
 
@@ -8,17 +8,17 @@ import tiktoken
 import openai
 import argparse
 
-def main(args):
+def stream_chat(model="gpt-3.5-turbo", load_log="", user=""):
     # Set your API key
     with open(keyfile) as f:
         openai.api_key = f.read().strip()
 
     # Set the chatbot's parameters
     chat_params = {
-        "model": "gpt-3.5-turbo",
+        "model": model,
         "n":1,
         "stream":True,
-        "user":"cyxisaac@gmail.com"
+        "user":user
     }
 
     try:
@@ -28,7 +28,7 @@ def main(args):
     
     app = QApplication()
 
-    chat_log = TextLog(args.file)
+    chat_log = TextLog(load_log)
     client = StreamClient(chat_log, chat_params, encoding)
     chat_thread = StreamThread(client)
     chat_window = ChatWindow(client, chat_thread)
@@ -39,11 +39,3 @@ def main(args):
     chat_window.show()
     # run the application event loop
     sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-f","--file", help="load a log file", type=str, default="")
-    parser.add_argument("-p","--print", help="print loaded log file", action="store_true")
-    args = parser.parse_args()
-    main(args)
