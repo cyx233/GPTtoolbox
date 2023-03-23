@@ -1,11 +1,16 @@
 # GPTtoolbox
 Apps with GUI for various models of GPT. Support searching on local database.
 
-## Requirements
+## Installation
+### Executable files 
+Get them in [Release](https://github.com/cyx233/GPTtoolbox/releases/latest)
+
+### Run in console
 ```bash
 sudo apt-get install qtbase5-dev
 sudo apt-get install liblmdb-dev
 pip install -r requirements.txt
+python src/main.py
 ```
 
 ## API key
@@ -16,9 +21,6 @@ pip install -r requirements.txt
 **Important Action: Ensure the safety of your API keys. Never make them publicly accessible or upload them to a public repository.**
 
 ## Usage
-```
-python src/main.py
-```
 ### Available programs
 |Name|Filename|Fucntion|
 |--|--|--|
