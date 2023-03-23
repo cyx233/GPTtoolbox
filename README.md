@@ -1,5 +1,5 @@
 # GPTtoolbox
-Apps with GUI for various models of GPT. Support searching on local database.
+![](demo/intro.png)
 
 ## Installation
 ### Executable files 
