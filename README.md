@@ -14,7 +14,7 @@ python src/main.py
 ```
 
 ## API key
-1. Get Your [Openai API keys](https://platform.openai.com/account/api-keys)
+1. Get Your [Openai API keys](https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key)
 2. Paste it in config 
     ![](demo/config.png)
 
