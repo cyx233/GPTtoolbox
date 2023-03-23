@@ -128,7 +128,7 @@ class ConfigDialog(QDialog):
                 button = QPushButton("Browse")
                 if label == self.save_dir_label:
                     button.clicked.connect(self.select_save_dir)
-                elif label == self.usage_file_edit:
+                elif label == self.usage_file_label:
                     button.clicked.connect(self.select_usage_file)
                 else:
                     button.clicked.connect(self.select_db_dir)
@@ -217,14 +217,13 @@ class ConfigDialog(QDialog):
 
     def select_usage_file(self):
         options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
         file_path, _ = QFileDialog.getSaveFileName(self, "Select File", self.usage_file_edit.text(), "JSON Files (*.json)", options=options)
         if file_path:
             self.usage_file_edit.setText(file_path)
 
     def select_db_dir(self):
         options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
+        options |= QFileDialog.ShowDirsOnly
         directory = QFileDialog.getExistingDirectory(self, "Select Directory", self.db_dir_edit.text(), options=options)
         if directory:
             self.db_dir_edit.setText(directory)
