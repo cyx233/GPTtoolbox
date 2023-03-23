@@ -4,6 +4,7 @@ app with GUI for various models of GPT
 ## Requirements
 ```bash
 sudo apt-get install qtbase5-dev
+sudo apt-get install liblmdb-dev
 pip install -r requirements.txt
 ```
 
