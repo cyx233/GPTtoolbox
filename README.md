@@ -25,7 +25,7 @@ python src/main.py
 |Name|Filename|Fucntion|
 |--|--|--|
 |Chat|src/app/stream_chat.py| Text conversation|
-|Chat On DB|src/app/db_chat.py| Text conversation according to background knowledge|
+|Chat On DB|src/app/db_chat.py| Text conversation based on background knowledge|
 
 ### Chat on DB
 ![](demo/db_chat.png)
