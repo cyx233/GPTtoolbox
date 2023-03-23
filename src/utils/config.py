@@ -2,8 +2,9 @@ import configparser
 import json
 import os
 import lmdb
+import sys
 
-src_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+src_dir = os.path.normpath(os.path.join(os.path.realpath(sys.argv[0]), ".."))
 config_file = os.path.join(src_dir,'config.ini')
 
 
@@ -36,7 +37,7 @@ def init_usage(usage_file, old_path=None):
 def init_saves(save_dir):
     config = configparser.ConfigParser()
     config.read(config_file)
-    save_dir = config.get('settings', 'save_dir')
+    save_dir = config.get('settings', 'save_dir', fallback='saves')
     if not os.path.isabs(save_dir):
         save_dir = os.path.normpath(os.path.join(src_dir, save_dir))
     os.makedirs(save_dir,exist_ok=True)
@@ -45,7 +46,7 @@ def init_saves(save_dir):
 def increase_usage(model, increase):
     config = configparser.ConfigParser()
     config.read(config_file)
-    usage_file = config.get('settings', 'usage_file')
+    usage_file = config.get('settings', 'usage_file', fallback='usage.json')
     with open(usage_file) as f:
         usage = json.load(f)
 
@@ -69,9 +70,12 @@ def init_db_dir():
 def init_config():
     config = configparser.ConfigParser()
     config.read(config_file)
-    save_dir = config.get('settings', 'save_dir')
-    usage_file = config.get('settings', 'usage_file')
+    save_dir = config.get('settings', 'save_dir', fallback='saves')
+    usage_file = config.get('settings', 'usage_file', fallback='usage.json')
 
+    if 'settings' not in config:
+        config['settings'] = {}
+    config['settings']['api_key'] = config.get('settings', 'api_key', fallback='xxxxx[YOUR_API_KEY]')
     config['settings']['save_dir'] = init_saves(save_dir)
     config['settings']['usage_file'] = init_usage(usage_file, usage_file)
     config['settings']['font_size'] = config.get('settings', 'font_size', fallback='18')

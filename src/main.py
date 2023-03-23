@@ -1,8 +1,9 @@
 from PySide2.QtWidgets import QApplication
 from gui import LauncherWindow
+import utils
 import sys
 
-if __name__ == "__main__":
+def main():
     try:
         app = QApplication()
         launcher_window = LauncherWindow()
@@ -11,3 +12,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(e.with_traceback())
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
