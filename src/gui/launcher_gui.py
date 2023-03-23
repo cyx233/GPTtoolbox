@@ -1,9 +1,8 @@
 from PySide2.QtWidgets import ( QMainWindow, QWidget, QVBoxLayout, 
                                 QHBoxLayout, QPushButton, QDialog, 
                                 QMessageBox, QFileDialog)
-from PySide2.QtCore import QSettings
 from app import stream_chat, db_chat
-from utils import config_file
+from utils import get_config
 
 from .chat_gui import ChatWindow
 from .config_gui import ConfigDialog 
@@ -33,11 +32,9 @@ class LauncherWindow(QMainWindow):
         layout.addWidget(db_chat_button)
         layout.addWidget(config_button)
 
-        settings = QSettings(config_file, QSettings.IniFormat)
-
         # Add buttons for other programs here
         self.central_widget.setLayout(layout)
-        self.central_widget.setStyleSheet(f"font-size: {settings.value('settings/font_size', '18')}pt")
+        self.central_widget.setStyleSheet(f"font-size: {get_config('settings', 'font_size')}pt")
     
     def launch_stream_chat(self):
         stream_chat()

@@ -3,7 +3,6 @@ import lmdb
 import numpy as np
 import openai
 from PySide2.QtWidgets import QApplication, QFileDialog, QMessageBox, QProgressBar, QWidget, QVBoxLayout
-from PySide2.QtCore import QSettings
 import os
 from utils import get_config, env, increase_usage
 

@@ -2,8 +2,8 @@ from PySide2.QtWidgets import ( QMainWindow, QWidget, QVBoxLayout,
                                 QHBoxLayout, QPushButton, QDialog, 
                                 QLabel, QLineEdit, QMessageBox,
                                 QFileDialog)
-from PySide2.QtCore import QSettings
-from utils import config_file, init_saves, init_usage, init_db_dir, env
+from utils import config_file, init_saves, init_usage, init_db_dir, env, get_config
+import configparser
 
 class DBConfigDialog(QDialog):
     def __init__(self, parent=None):
@@ -21,10 +21,13 @@ class DBConfigDialog(QDialog):
         self.chunk_size_label = QLabel("Text Chunk Size")
         self.chunk_size_edit = QLineEdit()
 
-        settings = QSettings(config_file, QSettings.IniFormat)
-        max_dbs = settings.value("db_settings/max_dbs", 10)
-        map_size = settings.value("db_settings/map_size", 1_000_000_000)
-        chunk_size = settings.value("db_settings/chunk_size", 2048)
+
+        config = configparser.ConfigParser()
+        config.read(config_file)
+
+        max_dbs = config.get('db_settings', 'max_dbs')
+        map_size = config.get('db_settings', 'map_size')
+        chunk_size = config.get('db_settings', 'chunk_size')
 
         # Add default values to the widgets
         self.max_dbs_edit.setText(str(max_dbs))
@@ -57,19 +60,24 @@ class DBConfigDialog(QDialog):
         max_dbs = self.max_dbs_edit.text()
         map_size = self.map_size_edit.text()
 
-        settings = QSettings(config_file, QSettings.IniFormat)
+        config = configparser.ConfigParser()
+        config.read(config_file)
+        
         if max_dbs and max_dbs.isdigit():
-            settings.setValue("db_settings/max_dbs", int(max_dbs))
+            config['db_settings']['max_dbs'] = int(max_dbs)
         else:
             QMessageBox.warning(self, "Warning", "max_dbs is not a number")
         if map_size and map_size.isdigit():
-            settings.setValue("db_settings/map_size", int(map_size))
+            config['db_settings']['map_size'] = int(map_size)
         else:
             QMessageBox.warning(self, "Warning", "map_size is not a number")
         if chunk_size and chunk_size.isdigit():
-            settings.setValue("db_settings/chunk_size", int(chunk_size))
+            config['db_settings']['chunk_size'] = int(chunk_size)
         else:
             QMessageBox.warning(self, "Warning", "chunk_size is not a number")
+
+        with open(config_file, "w") as f:
+            config.write(f)
 
         env.set_mapsize(int(map_size))
 
@@ -130,12 +138,15 @@ class ConfigDialog(QDialog):
 
 
         # Load the current API key from config.ini
-        settings = QSettings(config_file, QSettings.IniFormat)
-        api_key = settings.value("settings/api_key", "")
-        save_dir = settings.value("settings/save_dir", "save_dir")
-        usage_file = settings.value("settings/usage_file", "usage_file")
-        db_dir = settings.value("settings/db_dir", "db_dir")
-        font_size = settings.value("settings/font_size", "18")
+
+        config = configparser.ConfigParser()
+        config.read(config_file)
+
+        api_key = config.get('settings','api_key')
+        save_dir = config.get('settings','save_dir')
+        usage_file = config.get('settings','usage_file')
+        db_dir = config.get('settings','db_dir')
+        font_size = config.get('settings','font_size')
 
         self.old_path = usage_file
         self.api_key_edit.setText(api_key)
@@ -171,24 +182,30 @@ class ConfigDialog(QDialog):
         usage_file = self.usage_file_edit.text().strip()
         db_dir = self.db_dir_edit.text().strip()
         font_size = self.font_size_edit.text().strip()
-        settings = QSettings(config_file, QSettings.IniFormat)
+
+
+        config = configparser.ConfigParser()
+        config.read(config_file)
 
         if api_key:
-            settings.setValue("settings/api_key", api_key)
+            config['settings']['api_key'] = api_key
         else:
             QMessageBox.warning(self, "Warning", "API Key cannot be empty")
 
-        settings.setValue("settings/save_dir", save_dir)
+        config['settings']['save_dir'] = save_dir
         init_saves(save_dir)
 
-        settings.setValue("settings/usage_file", usage_file)
+        config['settings']['usage_file'] = usage_file
         init_usage(usage_file, self.old_path)
 
-        settings.setValue("settings/db_dir", db_dir)
+        config['settings']['db_dir'] = db_dir
         init_db_dir()
 
-        settings.setValue("settings/font_size", font_size)
+        config['settings']['font_size'] = font_size
         self.setStyleSheet(f"font-size: {font_size}pt")
+
+        with open(config_file, "w") as f:
+            config.write(f)
         super().accept()
 
     def select_save_dir(self):
