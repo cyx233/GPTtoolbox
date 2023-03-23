@@ -55,9 +55,19 @@ def db_text_chat(message, filenames, chat_log:TextLog, chat_params, encoding, pr
         return text_chat(message, chat_log, chat_params, encoding)
     doc_limit = prompt_limit // 2
     chatlog_limit = prompt_limit // 2
-
     model = get_config('model', 'embedding')
-    response = openai.Embedding.create(model=model, input=message)
+
+    chat_log.append("user", message)
+    num_prompt = chat_log.num_tokens_from_messages(encoding)
+    while num_prompt >= chatlog_limit:
+        chat_log.popleft()
+        num_prompt = chat_log.num_tokens_from_messages(encoding)
+
+    if len(chat_log) == 0:
+        chat_log.pop()
+        return 0, [], None
+
+    response = openai.Embedding.create(model=model, input=str(chat_log))
     query = np.array(response['data'][0]["embedding"])
     increase_usage(model, response['usage']['prompt_tokens'])
 
@@ -81,16 +91,6 @@ def db_text_chat(message, filenames, chat_log:TextLog, chat_params, encoding, pr
         if num_prompt >= doc_limit:
             relevent_doc.revert_append()
             break
-
-    chat_log.append("user", message)
-    num_prompt = chat_log.num_tokens_from_messages(encoding)
-    while num_prompt >= chatlog_limit:
-        chat_log.popleft()
-        num_prompt = chat_log.num_tokens_from_messages(encoding)
-
-    if len(chat_log) == 0:
-        chat_log.pop()
-        return 0, [], None
 
     response = openai.ChatCompletion.create(
         messages = relevent_doc.get_logs()[::-1] + chat_log.get_logs(),
