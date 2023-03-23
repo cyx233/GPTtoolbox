@@ -5,7 +5,7 @@ Apps with GUI for various models of GPT. Support searching on local database.
 ### Executable files 
 Get them in [Release](https://github.com/cyx233/GPTtoolbox/releases/latest)
 
-### Run in console
+### Or Run in console
 ```bash
 sudo apt-get install qtbase5-dev
 sudo apt-get install liblmdb-dev
