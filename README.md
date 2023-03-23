@@ -1,5 +1,5 @@
 # GPTtoolbox
-app with GUI for various models of GPT
+Apps with GUI for various models of GPT. Support searching on local database.
 
 ## Requirements
 ```bash
@@ -28,6 +28,6 @@ python src/main.py
 ### Chat on DB
 ![](demo/db_chat.png)
 
-Use `Process` to load documents to `LMDB`.
+Use `Process` to load documents to `LMDB`.  Support text and PDF. PDF will be extracted to text automatically.
 
 Click filenames in the right list to set it as background knowledge.
